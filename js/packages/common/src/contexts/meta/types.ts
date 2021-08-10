@@ -1,29 +1,29 @@
+import { AccountInfo } from '@solana/web3.js';
 import {
-  Metadata,
-  ParsedAccount,
-  Edition,
   AuctionData,
-  SafetyDepositBox,
+  AuctionDataExtended,
   BidderMetadata,
   BidderPot,
-  Vault,
-  AuctionDataExtended,
+  Edition,
   MasterEditionV1,
   MasterEditionV2,
-  PublicKeyStringAndAccount,
-} from '@oyster/common';
-import { AccountInfo, PublicKey } from '@solana/web3.js';
+  Metadata,
+  SafetyDepositBox,
+  Vault,
+} from '../../actions';
 import {
   AuctionManagerV1,
+  AuctionManagerV2,
   BidRedemptionTicket,
-  Store,
-  WhitelistedCreator,
+  BidRedemptionTicketV2,
   PayoutTicket,
   PrizeTrackingTicket,
-  AuctionManagerV2,
   SafetyDepositConfig,
-  BidRedemptionTicketV2,
-} from '@oyster/common/dist/lib/models/metaplex/index';
+  Store,
+  WhitelistedCreator,
+} from '../../models/metaplex';
+import { ParsedAccount } from '../accounts';
+import { PublicKeyStringAndAccount } from '../../utils';
 
 export interface MetaState {
   metadata: ParsedAccount<Metadata>[];
