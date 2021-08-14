@@ -1,10 +1,10 @@
 import { useConnection, useStore, useWallet } from '@oyster/common';
+import { WhitelistedCreator } from '@oyster/common/dist/lib/models/index';
 import { Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { saveAdmin } from '../../actions/saveAdmin';
 import { useMeta } from '../../contexts';
-import { WhitelistedCreator } from '../../models/metaplex';
 import { SetupVariables } from '../../components/SetupVariables';
 
 export const SetupView = () => {
