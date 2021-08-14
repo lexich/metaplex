@@ -544,8 +544,9 @@ export interface NexusGenFieldTypes {
     supplySnapshot: NexusGenScalars['BN'] | null; // BN
   }
   Query: { // field return type
-    creators: Array<NexusGenRootTypes['AccountWithWhitelistedCreator'] | null> | null; // [AccountWithWhitelistedCreator]
-    creatorsByStore: Array<NexusGenRootTypes['AccountWithWhitelistedCreator'] | null> | null; // [AccountWithWhitelistedCreator]
+    creatorByStore: NexusGenRootTypes['WhitelistedCreator'] | null; // WhitelistedCreator
+    creators: Array<NexusGenRootTypes['WhitelistedCreator'] | null> | null; // [WhitelistedCreator]
+    creatorsByStore: Array<NexusGenRootTypes['WhitelistedCreator'] | null> | null; // [WhitelistedCreator]
     creatorsCount: number | null; // Int
     hello: string | null; // String
     store: NexusGenRootTypes['AccountWithStore'] | null; // AccountWithStore
@@ -594,6 +595,7 @@ export interface NexusGenFieldTypes {
   WhitelistedCreator: { // field return type
     activated: boolean | null; // Boolean
     address: NexusGenScalars['PublicKey'] | null; // PublicKey
+    artworks: Array<NexusGenRootTypes['Metadata'] | null> | null; // [Metadata]
     key: NexusGenEnums['MetaplexKey'] | null; // MetaplexKey
   }
 }
@@ -810,8 +812,9 @@ export interface NexusGenFieldTypeNames {
     supplySnapshot: 'BN'
   }
   Query: { // field return type name
-    creators: 'AccountWithWhitelistedCreator'
-    creatorsByStore: 'AccountWithWhitelistedCreator'
+    creatorByStore: 'WhitelistedCreator'
+    creators: 'WhitelistedCreator'
+    creatorsByStore: 'WhitelistedCreator'
     creatorsCount: 'Int'
     hello: 'String'
     store: 'AccountWithStore'
@@ -860,12 +863,17 @@ export interface NexusGenFieldTypeNames {
   WhitelistedCreator: { // field return type name
     activated: 'Boolean'
     address: 'PublicKey'
+    artworks: 'Metadata'
     key: 'MetaplexKey'
   }
 }
 
 export interface NexusGenArgTypes {
   Query: {
+    creatorByStore: { // args
+      creatorId: string; // String!
+      storeId: string; // String!
+    }
     creators: { // args
       id?: string | null; // String
     }
