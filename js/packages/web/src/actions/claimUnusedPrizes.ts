@@ -1,12 +1,10 @@
 import { Keypair, Connection, TransactionInstruction } from '@solana/web3.js';
 import {
-  actions,
   ParsedAccount,
   TokenAccount,
   SafetyDepositBox,
   deprecatedGetReservationList,
   MasterEditionV1,
-  MasterEditionV2,
   findProgramAddress,
   programIds,
   createAssociatedTokenAccountInstruction,
@@ -17,7 +15,7 @@ import {
 } from '@oyster/common';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { AccountLayout, MintLayout } from '@solana/spl-token';
-import { AuctionView, AuctionViewItem } from '../hooks';
+import { AuctionView } from '../hooks';
 import {
   WinningConfigType,
   redeemBid,
@@ -26,13 +24,14 @@ import {
   BidRedemptionTicket,
   getBidRedemption,
   PrizeTrackingTicket,
-} from '../models/metaplex';
+  AuctionViewItem,
+} from '@oyster/common/dist/lib/models/metaplex/index';
+import { createTokenAccount } from '@oyster/common/dist/lib/actions/account';
 import {
   eligibleForParticipationPrizeGivenWinningIndex,
   setupRedeemParticipationInstructions,
   setupRedeemPrintingV2Instructions,
 } from './sendRedeemBid';
-const { createTokenAccount } = actions;
 
 export async function findEligibleParticipationBidsForRedemption(
   auctionView: AuctionView,
