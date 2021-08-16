@@ -672,7 +672,7 @@ export async function createAuction(
   );
 }
 
-export async function startAuction(
+export async function startAuctionByResource(
   resource: StringPublicKey,
   creator: StringPublicKey,
   instructions: TransactionInstruction[],
