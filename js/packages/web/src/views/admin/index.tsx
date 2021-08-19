@@ -46,7 +46,6 @@ export const AdminView = () => {
       setStoreForOwner(wallet?.publicKey?.toBase58());
     }
   }, [store, storeAddress, connected, wallet?.publicKey]);
-  console.log('@admin', connected, storeAddress, isLoading, store);
 
   return (
     <>
