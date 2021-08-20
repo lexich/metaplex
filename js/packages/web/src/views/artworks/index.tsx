@@ -19,11 +19,13 @@ export enum ArtworkViewState {
 }
 
 export const ArtworksView = () => {
+  const [activeKey, setActiveKey] = useState(ArtworkViewState.Metaplex);
   const { connected, wallet } = useWallet();
+
   const ownedMetadata = useUserArts();
   const createdMetadata = useCreatorArts(wallet?.publicKey?.toBase58() || '');
   const { metadata, isLoading } = useMeta();
-  const [activeKey, setActiveKey] = useState(ArtworkViewState.Metaplex);
+
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
@@ -31,15 +33,19 @@ export const ArtworksView = () => {
     500: 1,
   };
 
+  // metadata
+  // createdMetadata
+  // ownedMetadata
+
   const items =
-    (activeKey === ArtworkViewState.Owned
+    activeKey === ArtworkViewState.Owned
       ? ownedMetadata.map(m => m.metadata)
-      : (activeKey === ArtworkViewState.Created
-        ? createdMetadata
-        : metadata));
+      : activeKey === ArtworkViewState.Created
+      ? createdMetadata
+      : metadata;
 
   useEffect(() => {
-    if(connected) {
+    if (connected) {
       setActiveKey(ArtworkViewState.Owned);
     } else {
       setActiveKey(ArtworkViewState.Metaplex);
@@ -57,13 +63,7 @@ export const ArtworksView = () => {
             const id = m.pubkey;
             return (
               <Link to={`/art/${id}`} key={idx}>
-                <ArtCard
-                  key={id}
-                  pubkey={m.pubkey}
-                  preview={false}
-                  height={250}
-                  width={250}
-                />
+                <ArtCard key={id} pubkey={m.pubkey} preview={false} />
               </Link>
             );
           })
