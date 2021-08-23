@@ -20,8 +20,8 @@ async function startApolloServer() {
         },
       ],
       mapping: {
-        Artwork: 'common.Metadata',
-        Creator: 'common.WhitelistedCreator',
+        Artwork: 'common.Artwork',
+        Creator: 'common.Creator',
       },
     },
     contextType: {

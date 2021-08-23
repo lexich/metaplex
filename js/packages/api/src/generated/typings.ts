@@ -100,7 +100,7 @@ export interface NexusGenObjects {
     amount?: NexusGenScalars['BN'] | null; // BN
     length?: NexusGenScalars['BN'] | null; // BN
   };
-  Artwork: common.Metadata;
+  Artwork: common.Artwork;
   ArtworkCreator: {
     // root type
     address: NexusGenScalars['PublicKey']; // PublicKey!
@@ -164,7 +164,7 @@ export interface NexusGenObjects {
     bidderPot?: NexusGenScalars['PublicKey'] | null; // PublicKey
     emptied?: boolean | null; // Boolean
   };
-  Creator: common.WhitelistedCreator;
+  Creator: common.Creator;
   Edition: {
     // root type
     edition?: NexusGenScalars['BN'] | null; // BN
@@ -425,7 +425,6 @@ export interface NexusGenFieldTypes {
     creatorsCount: number | null; // Int
     store: NexusGenRootTypes['Store'] | null; // Store
     storesCount: number | null; // Int
-    tokens: number | null; // Int
   };
   SafetyDepositBox: {
     // field return type
@@ -622,7 +621,6 @@ export interface NexusGenFieldTypeNames {
     creatorsCount: 'Int';
     store: 'Store';
     storesCount: 'Int';
-    tokens: 'Int';
   };
   SafetyDepositBox: {
     // field return type name
