@@ -4,7 +4,7 @@ import {
   artMaxSupply,
   artSupply,
   artType,
-} from '../mappers/art';
+} from '../artwork/mappers';
 
 export const Artwork = objectType({
   name: 'Artwork',
