@@ -260,7 +260,6 @@ type Query {
   creatorsCount: Int
   store(storeId: String!): Store
   storesCount: Int
-  tokens: Int
 }
 
 type SafetyDepositBox {
