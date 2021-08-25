@@ -1,5 +1,6 @@
 import { queryType, stringArg, list, nonNull } from 'nexus';
 import { Artwork } from './artwork';
+import { Auction } from './auction';
 import { ArtworksInput } from './inputs';
 import { Store, Creator } from './metaplex';
 
@@ -18,6 +19,11 @@ export const Query = queryType({
     t.field('artworksCount', {
       type: 'Int',
       resolve: (_, args, { dataSources: { api } }) => api.state.metadata.length,
+    });
+    t.field('auctionsCount', {
+      type: 'Int',
+      resolve: (_, args, { dataSources: { api } }) =>
+        Object.values(api.state.auctions).length,
     });
     t.field('store', {
       type: Store,
