@@ -13,13 +13,12 @@ import {
   createAssociatedTokenAccountInstruction,
   programIds,
   findProgramAddress,
+  AuctionView,
   AuctionState,
   TokenAccount,
   toPublicKey,
   WalletSigner,
 } from '@oyster/common';
-
-import { AuctionView } from '../hooks';
 
 import { claimBid } from '@oyster/common/dist/lib/models/metaplex/claimBid';
 import { emptyPaymentAccount } from '@oyster/common/dist/lib/models/metaplex/emptyPaymentAccount';
