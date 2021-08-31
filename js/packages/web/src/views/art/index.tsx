@@ -3,6 +3,7 @@ import { Row, Col, Divider, Layout, Tag, Button, Skeleton } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useQueryArtwork } from '../../hooks';
 import { useExtendedArt } from '../../hooks/useArt2';
+import { useGetArtworksByIdQuery } from '../../generated/graphql';
 
 import { ArtContent } from '../../components/ArtContent/next';
 import { shortenAddress, useConnection, useWallet } from '@oyster/common';
