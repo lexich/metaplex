@@ -3,11 +3,17 @@ import { loadAccounts } from '@oyster/common/dist/lib/contexts/meta/loadAccounts
 import { MetaState } from '@oyster/common/dist/lib/contexts/meta/types';
 import { subscribeAccountsChange } from '@oyster/common/dist/lib/contexts/meta/subscribeAccountsChange';
 import { isCreatorPartOfTheStore } from '@oyster/common/dist/lib/models/index';
-import { ParsedAccount } from '@oyster/common/dist/lib/contexts/accounts/types';
 import { Context } from './context';
 import { NexusGenInputs } from './generated/typings';
-import { loadUserTokenAccounts } from './loaders/loadUserTokenAccounts';
+import { loadUserTokenAccounts } from './utils/loadUserTokenAccounts';
 import { filterByOwner, filterByStoreAndCreator } from './artwork/filters';
+import {
+  filterByParticipant,
+  filterByState,
+  getAuctionById,
+  getAuctionsByStoreId,
+} from './auction/filters';
+import { mapInfo, wrapPubkey } from './utils/mapInfo';
 
 // XXX: re-use list from `contexts/connection` ?
 export const ENDPOINTS = [
@@ -45,7 +51,7 @@ export class MetaplexApi {
   private static configs: Record<string, ConnectionConfig> = {};
   private static states: Record<string, MetaState> = {};
 
-  public static load() {
+  public static load(skipSubscriptions = false) {
     if (!Object.keys(this.configs).length) {
       ENDPOINTS.forEach(({ name, endpoint }) => {
         const connection = new Connection(endpoint, 'recent');
@@ -57,7 +63,7 @@ export class MetaplexApi {
             this.states[name] = state;
 
             // XXX: there is a GAP before subscribe
-            this.subscribe(name);
+            if (!skipSubscriptions) this.subscribe(name);
           })
           .catch(e => console.error(e));
 
@@ -154,17 +160,24 @@ export class MetaplexApi {
     );
   }
 
-  async getArtwork(artId: string) {
+  getArtwork(artId: string) {
     const art = this.state.metadata.find(({ pubkey }) => pubkey === artId);
     return art ? wrapPubkey(art) : null;
   }
+
+  getAuctions({
+    storeId,
+    state,
+    participantId,
+  }: NexusGenInputs['AuctionsInput']) {
+    const stateFilter = filterByState({ state }, this);
+    const participantFilter = filterByParticipant({ participantId }, this);
+    return getAuctionsByStoreId(this.state, storeId).filter(
+      auction => stateFilter(auction) && participantFilter(auction),
+    );
+  }
+
+  getAuction(auctionId: string) {
+    return getAuctionById(this.state, auctionId);
+  }
 }
-
-const mapInfo = <T>(list: ParsedAccount<T>[]) => {
-  return list.map(wrapPubkey);
-};
-
-const wrapPubkey = <T>({ pubkey, info }: ParsedAccount<T>) => ({
-  ...info,
-  pubkey,
-});

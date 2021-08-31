@@ -34,7 +34,7 @@ input ArtworksInput {
   storeId: String!
 }
 
-type AuctionData {
+type Auction {
   """
   Gap time is the amount of time in slots after the previous bid at which the auction ends.
   """
@@ -54,20 +54,25 @@ type AuctionData {
 
   """Slot time the auction was officially ended by."""
   endedAt: BN
+  highestBid: BidderMetadata
 
   """
   The time the last bid was placed, used to keep track of auction timing.
   """
   lastBid: BN
+  manager: AuctionManager
+  numWinners: BN
 
   """Minimum price for any bid to meet."""
   priceFloor: PriceFloor
+  pubkey: PublicKey!
 
   """The state the auction is in, whether it has started or ended."""
   state: AuctionState
 
   """Token mint for the SPL token being used to bid"""
   tokenMint: PublicKey
+  trumbnail: Artwork
 }
 
 type AuctionDataExtended {
@@ -76,18 +81,57 @@ type AuctionDataExtended {
   totalUncancelledBids: BN
 }
 
+enum AuctionInputState {
+  all
+  ended
+  live
+  resale
+}
+
+union AuctionManager = AuctionManagerV1 | AuctionManagerV2
+
+type AuctionManagerStateV1 {
+  status: Int
+  winningConfigItemsValidated: Int
+}
+
+type AuctionManagerStateV2 {
+  bidsPushedToAcceptPayment: BN
+  hasParticipation: Boolean
+  safetyConfigItemsValidated: BN
+  status: Int
+}
+
 type AuctionManagerV1 {
-  key: MetaplexKey
+  acceptPayment: PublicKey
+  auction: PublicKey
+  authority: PublicKey
+  key: Int
+  state: AuctionManagerStateV1
+  store: PublicKey
+  vault: PublicKey
 }
 
 type AuctionManagerV2 {
-  key: MetaplexKey
+  acceptPayment: PublicKey
+  auction: PublicKey
+  authority: PublicKey
+  key: Int
+  state: AuctionManagerStateV2
+  store: PublicKey
+  vault: PublicKey
 }
 
 enum AuctionState {
   Created
   Ended
   Started
+}
+
+input AuctionsInput {
+  participantId: String
+  state: AuctionInputState
+  storeId: String
 }
 
 """GraphQL representation of BigNumber"""
@@ -99,7 +143,7 @@ type Bid {
 }
 
 type BidRedemptionTicket {
-  key: MetaplexKey
+  key: Int
 }
 
 type BidState {
@@ -147,7 +191,7 @@ scalar Buffer
 type Creator {
   activated: Boolean
   address: PublicKey
-  key: MetaplexKey
+  key: Int
   pubkey: PublicKey
 }
 
@@ -187,22 +231,6 @@ enum MetadataKey {
   Uninitialized
 }
 
-enum MetaplexKey {
-  AuctionManagerV1
-  AuctionManagerV2
-  AuctionWinnerTokenTypeTrackerV1
-  BidRedemptionTicketV1
-  BidRedemptionTicketV2
-  OriginalAuthorityLookupV1
-  PayoutTicketV1
-  PrizeTrackingTicketV1
-  SafetyDepositConfigV1
-  SafetyDepositValidationTicketV1
-  StoreV1
-  Uninitialized
-  WhitelistedCreatorV1
-}
-
 enum NonWinningConstraint {
   GivenForBidPrice
   GivenForFixedPrice
@@ -221,7 +249,7 @@ type ParticipationStateV2 {
 
 type PayoutTicket {
   amountPaid: BN
-  key: MetaplexKey
+  key: Int
   recipient: PublicKey
 }
 
@@ -243,7 +271,7 @@ enum PriceFloorType {
 
 type PrizeTrackingTicket {
   expectedRedemptions: BN
-  key: MetaplexKey
+  key: Int
   metadata: PublicKey
   redemptions: BN
   supplySnapshot: BN
@@ -255,6 +283,9 @@ type Query {
   artwork(artId: String!): Artwork
   artworks(filter: ArtworksInput!): [Artwork]
   artworksCount: Int
+  auction(auctionId: String!): Auction
+  auctions(filter: AuctionsInput!): [Auction]
+  auctionsCount: Int
   creator(creatorId: String!, storeId: String!): Creator
   creators(storeId: String!): [Creator]
   creatorsCount: Int
@@ -281,7 +312,7 @@ type SafetyDepositConfig {
   amountRanges: [AmountRange]
   amountType: TupleNumericType
   auctionManager: PublicKey
-  key: MetaplexKey
+  key: Int
   lengthType: TupleNumericType
   order: BN
   participationConfig: ParticipationConfigV2
@@ -291,7 +322,7 @@ type SafetyDepositConfig {
 
 type Store {
   auctionProgram: PublicKey
-  key: MetaplexKey
+  key: Int
   pubkey: PublicKey
   public: Boolean
   tokenMetadataProgram: PublicKey

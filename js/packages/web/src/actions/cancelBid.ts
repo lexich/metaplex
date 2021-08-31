@@ -2,6 +2,7 @@ import {
   TokenAccount,
   cancelBid,
   cache,
+  isAuctionEnded,
   ensureWrappedAccount,
   sendTransactionWithRetry,
   AuctionState,
@@ -10,12 +11,12 @@ import {
   ParsedAccount,
   BidderMetadata,
   StringPublicKey,
+  AuctionView,
   WalletSigner,
   toPublicKey,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import { TransactionInstruction, Keypair, Connection } from '@solana/web3.js';
-import { AuctionView } from '../hooks';
 import {
   BidRedemptionTicket,
   PrizeTrackingTicket,
@@ -40,7 +41,7 @@ export async function sendCancelBid(
   let instructions: Array<TransactionInstruction[]> = [];
 
   if (
-    auctionView.auction.info.ended() &&
+    isAuctionEnded(auctionView.auction.info) &&
     auctionView.auction.info.state !== AuctionState.Ended
   ) {
     await setupPlaceBid(
@@ -72,7 +73,7 @@ export async function sendCancelBid(
     wallet.publicKey.equals(
       toPublicKey(auctionView.auctionManager.authority),
     ) &&
-    auctionView.auction.info.ended()
+    isAuctionEnded(auctionView.auction.info)
   ) {
     await claimUnusedPrizes(
       connection,

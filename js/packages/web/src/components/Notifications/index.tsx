@@ -8,9 +8,11 @@ import {
   findProgramAddress,
   programIds,
   StringPublicKey,
+  isAuctionEnded,
   toPublicKey,
   useConnection,
   useUserAccounts,
+  AuctionViewState,
   VaultState,
   WalletSigner,
 } from '@oyster/common';
@@ -27,7 +29,7 @@ import { settle } from '../../actions/settle';
 import { startAuctionManually } from '../../actions/startAuctionManually';
 import { QUOTE_MINT } from '../../constants';
 import { useMeta } from '../../contexts';
-import { AuctionViewState, useAuctions } from '../../hooks';
+import { useAuctions } from '../../hooks';
 
 interface NotificationCard {
   id: string;
@@ -193,7 +195,7 @@ export function useSettlementAuctions({
           a =>
             walletPubkey &&
             a.auctionManager.authority === walletPubkey &&
-            a.auction.info.ended(),
+            isAuctionEnded(a.auction.info),
         )
         .sort(
           (a, b) =>

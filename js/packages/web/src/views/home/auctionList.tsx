@@ -4,11 +4,12 @@ import BN from 'bn.js';
 import React, { useMemo, useState } from 'react';
 import Masonry from 'react-masonry-css';
 import { Link } from 'react-router-dom';
+import { AuctionView, AuctionViewState, isAuctionEnded } from '@oyster/common';
 import { AuctionRenderCard } from '../../components/AuctionRenderCard';
 import { CardLoader } from '../../components/MyLoader';
 import { PreSaleBanner } from '../../components/PreSaleBanner';
 import { useMeta } from '../../contexts';
-import { AuctionView, AuctionViewState, useAuctions } from '../../hooks';
+import { useAuctions } from '../../hooks';
 
 const { TabPane } = Tabs;
 
@@ -80,8 +81,7 @@ export const AuctionListView = () => {
         .concat(auctionsEnded)
         .filter(
           (m, idx) =>
-            m.myBidderMetadata?.info.bidderPubkey ==
-            publicKey?.toBase58(),
+            m.myBidderMetadata?.info.bidderPubkey == publicKey?.toBase58(),
         );
       break;
     case LiveAuctionViewState.Resale:
@@ -96,7 +96,7 @@ export const AuctionListView = () => {
     () =>
       auctions.filter(a => {
         // const now = moment().unix();
-        return !a.auction.info.ended() && !resaleAuctions.includes(a);
+        return !isAuctionEnded(a.auction.info) && !resaleAuctions.includes(a);
         // filter out auction for banner that are further than 30 days in the future
         // return Math.floor(delta / 86400) <= 30;
       })?.[0],

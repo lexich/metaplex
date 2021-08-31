@@ -12,14 +12,14 @@ import {
   BidderPot,
   createAssociatedTokenAccountInstruction,
   programIds,
+  isAuctionEnded,
   findProgramAddress,
+  AuctionView,
   AuctionState,
   TokenAccount,
   toPublicKey,
   WalletSigner,
 } from '@oyster/common';
-
-import { AuctionView } from '../hooks';
 
 import { claimBid } from '@oyster/common/dist/lib/models/metaplex/claimBid';
 import { emptyPaymentAccount } from '@oyster/common/dist/lib/models/metaplex/emptyPaymentAccount';
@@ -39,7 +39,7 @@ export async function settle(
   accountsByMint: Map<string, TokenAccount>,
 ) {
   if (
-    auctionView.auction.info.ended() &&
+    isAuctionEnded(auctionView.auction.info) &&
     auctionView.auction.info.state !== AuctionState.Ended
   ) {
     let signers: Keypair[][] = [];

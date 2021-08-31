@@ -3,17 +3,15 @@ import { Card, CardProps } from 'antd';
 import {
   formatTokenAmount,
   CountdownState,
+  AuctionView,
+  AuctionViewState,
   PriceFloorType,
   fromLamports,
+  timeToAuctionEnd,
   useMint,
 } from '@oyster/common';
 import { ArtContent } from '../ArtContent';
-import {
-  AuctionView,
-  AuctionViewState,
-  useArt,
-  useBidsForAuction,
-} from '../../hooks';
+import { useArt, useBidsForAuction } from '../../hooks';
 import { AmountLabel } from '../AmountLabel';
 import { useHighestBidForAuction } from '../../hooks';
 import { BN } from 'bn.js';
@@ -66,7 +64,7 @@ export const AuctionRenderCard = (props: AuctionCard) => {
   const auction = auctionView.auction.info;
   useEffect(() => {
     const calc = () => {
-      setState(auction.timeToEnd());
+      setState(timeToAuctionEnd(auction));
     };
 
     const interval = setInterval(() => {

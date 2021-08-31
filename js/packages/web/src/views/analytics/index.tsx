@@ -6,14 +6,16 @@ import { Pie, Bar } from 'react-chartjs-2';
 import {
   AuctionDataExtended,
   BidderPot,
+  isAuctionEnded,
   fromLamports,
   getAuctionExtended,
   Metadata,
   ParsedAccount,
+  AuctionView,
   programIds,
   useMint,
 } from '@oyster/common';
-import { AuctionView, useAuctions } from '../../hooks';
+import { useAuctions } from '../../hooks';
 import { QUOTE_MINT } from '../../constants';
 import { MintInfo } from '@solana/spl-token';
 
@@ -89,7 +91,7 @@ const rerun = async ({
     // and their amounts which are super hard to track, but I think they
     // are probably a minority anyway.
     if (
-      auction.auction.info.ended() &&
+      isAuctionEnded(auction.auction.info) &&
       auction.auction.info.tokenMint === QUOTE_MINT.toBase58()
     ) {
       if (!LOOKUP[auction.auction.pubkey]) {
