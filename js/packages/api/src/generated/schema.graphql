@@ -7,6 +7,33 @@ type AmountRange {
   length: BN
 }
 
+type Artwork {
+  creators: [ArtworkCreator]
+  edition: BN
+  maxSupply: BN
+  mint: PublicKey
+  pubkey: PublicKey!
+  sellerFeeBasisPoints: Int!
+  supply: BN
+  title: String!
+  type: Int!
+  uri: String!
+}
+
+type ArtworkCreator {
+  address: PublicKey!
+  share: Int!
+  verified: Boolean!
+}
+
+input ArtworksInput {
+  artId: String
+  creatorId: String
+  onlyVerified: Boolean
+  ownerId: String
+  storeId: String!
+}
+
 type AuctionData {
   """
   Gap time is the amount of time in slots after the previous bid at which the auction ends.
@@ -118,17 +145,10 @@ type BidderPot {
 scalar Buffer
 
 type Creator {
+  activated: Boolean
   address: PublicKey
-  share: Int
-  verified: Boolean
-}
-
-type Data {
-  creators: [Creator]
-  name: String
-  sellerFeeBasisPoints: Int
-  symbol: String
-  uri: String
+  key: MetaplexKey
+  pubkey: PublicKey
 }
 
 type Edition {
@@ -156,17 +176,6 @@ type MasterEditionV2 {
   key: MetadataKey
   maxSupply: BN
   supply: BN
-}
-
-type Metadata {
-  data: Data
-  edition: PublicKey
-  isMutable: Boolean
-  key: MetadataKey
-  masterEdition: PublicKey
-  mint: PublicKey
-  primarySaleHappened: Boolean
-  updateAuthority: PublicKey
 }
 
 enum MetadataKey {
@@ -243,10 +252,11 @@ type PrizeTrackingTicket {
 scalar PublicKey
 
 type Query {
-  artworks(creatorId: String, storeId: String!): [Metadata]
+  artwork(artId: String!): Artwork
+  artworks(filter: ArtworksInput!): [Artwork]
   artworksCount: Int
-  creator(creatorId: String!, storeId: String!): WhitelistedCreator
-  creators(storeId: String!): [WhitelistedCreator]
+  creator(creatorId: String!, storeId: String!): Creator
+  creators(storeId: String!): [Creator]
   creatorsCount: Int
   store(storeId: String!): Store
   storesCount: Int
@@ -282,6 +292,7 @@ type SafetyDepositConfig {
 type Store {
   auctionProgram: PublicKey
   key: MetaplexKey
+  pubkey: PublicKey
   public: Boolean
   tokenMetadataProgram: PublicKey
   tokenProgram: PublicKey
@@ -352,12 +363,6 @@ enum VaultState {
   Combined
   Deactivated
   Inactive
-}
-
-type WhitelistedCreator {
-  activated: Boolean
-  address: PublicKey
-  key: MetaplexKey
 }
 
 enum WinningConfigType {

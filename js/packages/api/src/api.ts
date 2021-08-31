@@ -5,8 +5,14 @@ import { subscribeAccountsChange } from '@oyster/common/dist/lib/contexts/meta/s
 import { isCreatorPartOfTheStore } from '@oyster/common/dist/lib/models/index';
 import { ParsedAccount } from '@oyster/common/dist/lib/contexts/accounts/types';
 import { Context } from './context';
+import { NexusGenInputs } from './generated/typings';
+import { loadUserTokenAccounts } from './loaders/loadUserTokenAccounts';
+import { filterByOwner, filterByStoreAndCreator } from './artwork/filters';
 
-const ENDPOINTS = [
+// XXX: re-use list from `contexts/connection` ?
+export const ENDPOINTS = [
+  // TODO: uncomment this
+  // TODO: check other mainnets (Solana, Serum)
   // {
   //   name: 'mainnet-beta',
   //   endpoint: 'https://api.metaplex.solana.com/',
@@ -21,46 +27,52 @@ const ENDPOINTS = [
   },
 ];
 
-const DEFAULT_ENDPOINT = ENDPOINTS.find(({ name }) => name === 'devnet')!;
-
-export const getData = async (): Promise<MetaState> => {
-  const endpoint = DEFAULT_ENDPOINT.endpoint;
-  const connection = new Connection(endpoint, 'recent');
-  return loadAccounts(connection, true);
-};
+// TODO: set to mainnet-beta
+export const DEFAULT_ENDPOINT = ENDPOINTS.find(
+  ({ name }) => name === 'devnet',
+)!;
 
 interface ConnectionConfig {
   connection: Connection;
-  loader: ReturnType<typeof loadAccounts>;
+  loader: Promise<any>;
   name: string;
 }
 
 export class MetaplexApi {
   state!: MetaState;
-  private static configs: ConnectionConfig[];
+  config!: ConnectionConfig;
+
+  private static configs: Record<string, ConnectionConfig> = {};
   private static states: Record<string, MetaState> = {};
 
-  private static firstLoad() {
-    if (!this.configs) {
-      this.configs = ENDPOINTS.map(({ name, endpoint }) => {
+  public static load() {
+    if (!Object.keys(this.configs).length) {
+      ENDPOINTS.forEach(({ name, endpoint }) => {
         const connection = new Connection(endpoint, 'recent');
+
         const loader = loadAccounts(connection, true);
-        loader.then(state => {
-          this.states[name] = state;
-          this.subscribe(name);
-        });
-        return {
+        loader
+          .then(state => {
+            console.log(`🏝️  ${name} meta loaded`);
+            this.states[name] = state;
+
+            // XXX: there is a GAP before subscribe
+            this.subscribe(name);
+          })
+          .catch(e => console.error(e));
+
+        this.configs[name] = {
           connection,
-          loader,
+          loader: Promise.all([loader]),
           name,
         };
       });
     }
-    return Promise.all(this.configs.map(c => c.loader));
+    return Promise.all(Object.values(this.configs).map(c => c.loader));
   }
 
   private static subscribe(name: string) {
-    const config = this.configs.find(c => c.name === name)!;
+    const config = this.configs[name];
     subscribeAccountsChange(
       config.connection,
       true,
@@ -71,22 +83,40 @@ export class MetaplexApi {
     );
   }
 
-  async initialize({ context }: { context: Omit<Context, 'dataSources'> }) {
-    await MetaplexApi.firstLoad();
-    this.state =
-      MetaplexApi.states[context.network || ''] ||
-      MetaplexApi.states[DEFAULT_ENDPOINT.name];
+  private static configByName(name?: string) {
+    return this.configs[name || ''] || this.configs[DEFAULT_ENDPOINT.name];
   }
 
-  // data methods
+  private static stateByName(name?: string) {
+    return this.states[name || ''] || MetaplexApi.states[DEFAULT_ENDPOINT.name];
+  }
+
+  // instance methods
+
+  async initialize({ context }: { context: Omit<Context, 'dataSources'> }) {
+    MetaplexApi.load();
+    this.config = MetaplexApi.configByName(context.network);
+    await this.config.loader;
+    this.state = MetaplexApi.stateByName(context.network);
+  }
+
+  loadUserAccounts(ownerId: string) {
+    const { connection } = this.config;
+    return loadUserTokenAccounts(connection, ownerId);
+  }
+
+  // meta methods
 
   getStore(storeId: string) {
-    return this.state.stores[storeId]?.info;
+    const store = this.state.stores[storeId];
+    return store ? wrapPubkey(store) : null;
   }
 
   async getCreators(storeId: string) {
+    const store = this.getStore(storeId);
     const creators = Object.values(this.state.creators);
     const creatorsByStore = [];
+    if (!store) return [];
 
     for (const creator of creators) {
       const isWhitelistedCreator = await isCreatorPartOfTheStore(
@@ -95,10 +125,10 @@ export class MetaplexApi {
         storeId,
       );
       if (isWhitelistedCreator) {
-        creatorsByStore.push(creator.info);
+        creatorsByStore.push(creator);
       }
     }
-    return creatorsByStore;
+    return mapInfo(creatorsByStore);
   }
 
   async getCreator(storeId: string, creatorId?: string | null) {
@@ -106,22 +136,35 @@ export class MetaplexApi {
     return creators.find(({ address }) => address === creatorId) || null;
   }
 
-  async getArtworks(storeId: string, creatorId?: string | null) {
-    const store = this.getStore(storeId);
-    const creator = await this.getCreator(storeId, creatorId);
-    if (creatorId && !creator?.activated) {
-      return [];
-    }
+  async getArtworks({
+    storeId,
+    creatorId,
+    ownerId,
+    onlyVerified,
+  }: NexusGenInputs['ArtworksInput']) {
+    const storeFilter = await filterByStoreAndCreator(
+      { storeId, creatorId, onlyVerified },
+      this,
+    );
 
-    const artworks = mapInfo(this.state.metadata);
-    return artworks.filter(({ data: { creators } }) => {
-      return creators?.some(({ address, verified }) => {
-        return verified && (creatorId ? address === creatorId : store.public);
-      });
-    });
+    const ownerFilter = await filterByOwner({ ownerId }, this);
+
+    return mapInfo(this.state.metadata).filter(
+      art => storeFilter(art) && ownerFilter(art),
+    );
+  }
+
+  async getArtwork(artId: string) {
+    const art = this.state.metadata.find(({ pubkey }) => pubkey === artId);
+    return art ? wrapPubkey(art) : null;
   }
 }
 
 const mapInfo = <T>(list: ParsedAccount<T>[]) => {
-  return list.map(({ info }) => info);
+  return list.map(wrapPubkey);
 };
+
+const wrapPubkey = <T>({ pubkey, info }: ParsedAccount<T>) => ({
+  ...info,
+  pubkey,
+});

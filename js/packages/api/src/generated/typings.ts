@@ -3,6 +3,7 @@
  * Do not make changes to this file directly
  */
 
+import type * as common from './../sourceTypes';
 import type { Context } from './../context';
 import type { core } from 'nexus';
 declare global {
@@ -56,7 +57,16 @@ declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface NexusGenInputs {}
+export interface NexusGenInputs {
+  ArtworksInput: {
+    // input type
+    artId?: string | null; // String
+    creatorId?: string | null; // String
+    onlyVerified?: boolean | null; // Boolean
+    ownerId?: string | null; // String
+    storeId: string; // String!
+  };
+}
 
 export interface NexusGenEnums {
   AuctionState: 0 | 2 | 1;
@@ -89,6 +99,13 @@ export interface NexusGenObjects {
     // root type
     amount?: NexusGenScalars['BN'] | null; // BN
     length?: NexusGenScalars['BN'] | null; // BN
+  };
+  Artwork: common.Artwork;
+  ArtworkCreator: {
+    // root type
+    address: NexusGenScalars['PublicKey']; // PublicKey!
+    share: number; // Int!
+    verified: boolean; // Boolean!
   };
   AuctionData: {
     // root type
@@ -147,20 +164,7 @@ export interface NexusGenObjects {
     bidderPot?: NexusGenScalars['PublicKey'] | null; // PublicKey
     emptied?: boolean | null; // Boolean
   };
-  Creator: {
-    // root type
-    address?: NexusGenScalars['PublicKey'] | null; // PublicKey
-    share?: number | null; // Int
-    verified?: boolean | null; // Boolean
-  };
-  Data: {
-    // root type
-    creators?: Array<NexusGenRootTypes['Creator'] | null> | null; // [Creator]
-    name?: string | null; // String
-    sellerFeeBasisPoints?: number | null; // Int
-    symbol?: string | null; // String
-    uri?: string | null; // String
-  };
+  Creator: common.Creator;
   Edition: {
     // root type
     edition?: NexusGenScalars['BN'] | null; // BN
@@ -180,17 +184,6 @@ export interface NexusGenObjects {
     key?: NexusGenEnums['MetadataKey'] | null; // MetadataKey
     maxSupply?: NexusGenScalars['BN'] | null; // BN
     supply?: NexusGenScalars['BN'] | null; // BN
-  };
-  Metadata: {
-    // root type
-    data?: NexusGenRootTypes['Data'] | null; // Data
-    edition?: NexusGenScalars['PublicKey'] | null; // PublicKey
-    isMutable?: boolean | null; // Boolean
-    key?: NexusGenEnums['MetadataKey'] | null; // MetadataKey
-    masterEdition?: NexusGenScalars['PublicKey'] | null; // PublicKey
-    mint?: NexusGenScalars['PublicKey'] | null; // PublicKey
-    primarySaleHappened?: boolean | null; // Boolean
-    updateAuthority?: NexusGenScalars['PublicKey'] | null; // PublicKey
   };
   ParticipationConfigV2: {
     // root type
@@ -247,6 +240,7 @@ export interface NexusGenObjects {
     // root type
     auctionProgram?: NexusGenScalars['PublicKey'] | null; // PublicKey
     key?: NexusGenEnums['MetaplexKey'] | null; // MetaplexKey
+    pubkey?: NexusGenScalars['PublicKey'] | null; // PublicKey
     public?: boolean | null; // Boolean
     tokenMetadataProgram?: NexusGenScalars['PublicKey'] | null; // PublicKey
     tokenProgram?: NexusGenScalars['PublicKey'] | null; // PublicKey
@@ -265,12 +259,6 @@ export interface NexusGenObjects {
     state?: NexusGenEnums['VaultState'] | null; // VaultState
     tokenProgram?: NexusGenScalars['PublicKey'] | null; // PublicKey
     tokenTypeCount?: number | null; // Int
-  };
-  WhitelistedCreator: {
-    // root type
-    activated?: boolean | null; // Boolean
-    address?: NexusGenScalars['PublicKey'] | null; // PublicKey
-    key?: NexusGenEnums['MetaplexKey'] | null; // MetaplexKey
   };
 }
 
@@ -293,6 +281,25 @@ export interface NexusGenFieldTypes {
     // field return type
     amount: NexusGenScalars['BN'] | null; // BN
     length: NexusGenScalars['BN'] | null; // BN
+  };
+  Artwork: {
+    // field return type
+    creators: Array<NexusGenRootTypes['ArtworkCreator'] | null> | null; // [ArtworkCreator]
+    edition: NexusGenScalars['BN'] | null; // BN
+    maxSupply: NexusGenScalars['BN'] | null; // BN
+    mint: NexusGenScalars['PublicKey'] | null; // PublicKey
+    pubkey: NexusGenScalars['PublicKey']; // PublicKey!
+    sellerFeeBasisPoints: number; // Int!
+    supply: NexusGenScalars['BN'] | null; // BN
+    title: string; // String!
+    type: number; // Int!
+    uri: string; // String!
+  };
+  ArtworkCreator: {
+    // field return type
+    address: NexusGenScalars['PublicKey']; // PublicKey!
+    share: number; // Int!
+    verified: boolean; // Boolean!
   };
   AuctionData: {
     // field return type
@@ -353,17 +360,10 @@ export interface NexusGenFieldTypes {
   };
   Creator: {
     // field return type
+    activated: boolean | null; // Boolean
     address: NexusGenScalars['PublicKey'] | null; // PublicKey
-    share: number | null; // Int
-    verified: boolean | null; // Boolean
-  };
-  Data: {
-    // field return type
-    creators: Array<NexusGenRootTypes['Creator'] | null> | null; // [Creator]
-    name: string | null; // String
-    sellerFeeBasisPoints: number | null; // Int
-    symbol: string | null; // String
-    uri: string | null; // String
+    key: NexusGenEnums['MetaplexKey'] | null; // MetaplexKey
+    pubkey: NexusGenScalars['PublicKey'] | null; // PublicKey
   };
   Edition: {
     // field return type
@@ -384,17 +384,6 @@ export interface NexusGenFieldTypes {
     key: NexusGenEnums['MetadataKey'] | null; // MetadataKey
     maxSupply: NexusGenScalars['BN'] | null; // BN
     supply: NexusGenScalars['BN'] | null; // BN
-  };
-  Metadata: {
-    // field return type
-    data: NexusGenRootTypes['Data'] | null; // Data
-    edition: NexusGenScalars['PublicKey'] | null; // PublicKey
-    isMutable: boolean | null; // Boolean
-    key: NexusGenEnums['MetadataKey'] | null; // MetadataKey
-    masterEdition: NexusGenScalars['PublicKey'] | null; // PublicKey
-    mint: NexusGenScalars['PublicKey'] | null; // PublicKey
-    primarySaleHappened: boolean | null; // Boolean
-    updateAuthority: NexusGenScalars['PublicKey'] | null; // PublicKey
   };
   ParticipationConfigV2: {
     // field return type
@@ -428,10 +417,11 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
-    artworks: Array<NexusGenRootTypes['Metadata'] | null> | null; // [Metadata]
+    artwork: NexusGenRootTypes['Artwork'] | null; // Artwork
+    artworks: Array<NexusGenRootTypes['Artwork'] | null> | null; // [Artwork]
     artworksCount: number | null; // Int
-    creator: NexusGenRootTypes['WhitelistedCreator'] | null; // WhitelistedCreator
-    creators: Array<NexusGenRootTypes['WhitelistedCreator'] | null> | null; // [WhitelistedCreator]
+    creator: NexusGenRootTypes['Creator'] | null; // Creator
+    creators: Array<NexusGenRootTypes['Creator'] | null> | null; // [Creator]
     creatorsCount: number | null; // Int
     store: NexusGenRootTypes['Store'] | null; // Store
     storesCount: number | null; // Int
@@ -460,6 +450,7 @@ export interface NexusGenFieldTypes {
     // field return type
     auctionProgram: NexusGenScalars['PublicKey'] | null; // PublicKey
     key: NexusGenEnums['MetaplexKey'] | null; // MetaplexKey
+    pubkey: NexusGenScalars['PublicKey'] | null; // PublicKey
     public: boolean | null; // Boolean
     tokenMetadataProgram: NexusGenScalars['PublicKey'] | null; // PublicKey
     tokenProgram: NexusGenScalars['PublicKey'] | null; // PublicKey
@@ -479,12 +470,6 @@ export interface NexusGenFieldTypes {
     tokenProgram: NexusGenScalars['PublicKey'] | null; // PublicKey
     tokenTypeCount: number | null; // Int
   };
-  WhitelistedCreator: {
-    // field return type
-    activated: boolean | null; // Boolean
-    address: NexusGenScalars['PublicKey'] | null; // PublicKey
-    key: NexusGenEnums['MetaplexKey'] | null; // MetaplexKey
-  };
 }
 
 export interface NexusGenFieldTypeNames {
@@ -492,6 +477,25 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     amount: 'BN';
     length: 'BN';
+  };
+  Artwork: {
+    // field return type name
+    creators: 'ArtworkCreator';
+    edition: 'BN';
+    maxSupply: 'BN';
+    mint: 'PublicKey';
+    pubkey: 'PublicKey';
+    sellerFeeBasisPoints: 'Int';
+    supply: 'BN';
+    title: 'String';
+    type: 'Int';
+    uri: 'String';
+  };
+  ArtworkCreator: {
+    // field return type name
+    address: 'PublicKey';
+    share: 'Int';
+    verified: 'Boolean';
   };
   AuctionData: {
     // field return type name
@@ -552,17 +556,10 @@ export interface NexusGenFieldTypeNames {
   };
   Creator: {
     // field return type name
+    activated: 'Boolean';
     address: 'PublicKey';
-    share: 'Int';
-    verified: 'Boolean';
-  };
-  Data: {
-    // field return type name
-    creators: 'Creator';
-    name: 'String';
-    sellerFeeBasisPoints: 'Int';
-    symbol: 'String';
-    uri: 'String';
+    key: 'MetaplexKey';
+    pubkey: 'PublicKey';
   };
   Edition: {
     // field return type name
@@ -583,17 +580,6 @@ export interface NexusGenFieldTypeNames {
     key: 'MetadataKey';
     maxSupply: 'BN';
     supply: 'BN';
-  };
-  Metadata: {
-    // field return type name
-    data: 'Data';
-    edition: 'PublicKey';
-    isMutable: 'Boolean';
-    key: 'MetadataKey';
-    masterEdition: 'PublicKey';
-    mint: 'PublicKey';
-    primarySaleHappened: 'Boolean';
-    updateAuthority: 'PublicKey';
   };
   ParticipationConfigV2: {
     // field return type name
@@ -627,10 +613,11 @@ export interface NexusGenFieldTypeNames {
   };
   Query: {
     // field return type name
-    artworks: 'Metadata';
+    artwork: 'Artwork';
+    artworks: 'Artwork';
     artworksCount: 'Int';
-    creator: 'WhitelistedCreator';
-    creators: 'WhitelistedCreator';
+    creator: 'Creator';
+    creators: 'Creator';
     creatorsCount: 'Int';
     store: 'Store';
     storesCount: 'Int';
@@ -659,6 +646,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     auctionProgram: 'PublicKey';
     key: 'MetaplexKey';
+    pubkey: 'PublicKey';
     public: 'Boolean';
     tokenMetadataProgram: 'PublicKey';
     tokenProgram: 'PublicKey';
@@ -678,20 +666,17 @@ export interface NexusGenFieldTypeNames {
     tokenProgram: 'PublicKey';
     tokenTypeCount: 'Int';
   };
-  WhitelistedCreator: {
-    // field return type name
-    activated: 'Boolean';
-    address: 'PublicKey';
-    key: 'MetaplexKey';
-  };
 }
 
 export interface NexusGenArgTypes {
   Query: {
+    artwork: {
+      // args
+      artId: string; // String!
+    };
     artworks: {
       // args
-      creatorId?: string | null; // String
-      storeId: string; // String!
+      filter: NexusGenInputs['ArtworksInput']; // ArtworksInput!
     };
     creator: {
       // args
@@ -717,7 +702,7 @@ export interface NexusGenTypeInterfaces {}
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames = never;
+export type NexusGenInputNames = keyof NexusGenInputs;
 
 export type NexusGenEnumNames = keyof NexusGenEnums;
 
