@@ -36,7 +36,6 @@ const run = async () => {
   const a = await getData();
 
   console.log(inspect(a, { showHidden: false, depth: 5 }));
-  console.log(a.length);
 };
 
 void run();

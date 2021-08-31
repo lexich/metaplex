@@ -7,7 +7,6 @@ import { Context } from './context';
 import { NexusGenInputs } from './generated/typings';
 import { loadUserTokenAccounts } from './utils/loadUserTokenAccounts';
 import { filterByOwner, filterByStoreAndCreator } from './artwork/filters';
-import { auctionView } from './auction/mappers';
 import {
   filterByParticipant,
   filterByState,
