@@ -4,6 +4,7 @@ import {
   programIds,
   TokenAccount,
   createMint,
+  isAuctionEnded,
   SafetyDepositBox,
   cache,
   ensureWrappedAccount,
@@ -97,7 +98,7 @@ export async function sendRedeemBid(
   let instructions: Array<TransactionInstruction[]> = [];
 
   if (
-    auctionView.auction.info.ended() &&
+    isAuctionEnded(auctionView.auction.info) &&
     auctionView.auction.info.state !== AuctionState.Ended
   ) {
     await setupPlaceBid(

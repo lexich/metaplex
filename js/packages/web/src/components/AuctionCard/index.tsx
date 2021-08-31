@@ -7,6 +7,7 @@ import {
   useUserAccounts,
   MetaplexModal,
   MetaplexOverlay,
+  isAuctionEnded,
   formatAmount,
   formatTokenAmount,
   useMint,
@@ -111,7 +112,12 @@ function useGapTickCheck(
   auctionView: AuctionView,
 ): boolean {
   return !!useMemo(() => {
-    if (gapTick && value && gapTime && !auctionView.auction.info.ended()) {
+    if (
+      gapTick &&
+      value &&
+      gapTime &&
+      !isAuctionEnded(auctionView.auction.info)
+    ) {
       // so we have a gap tick percentage, and a gap tick time, and a value, and we're not ended - are we within gap time?
       const now = moment().unix();
       const endedAt = auctionView.auction.info.endedAt;
@@ -264,7 +270,7 @@ export const AuctionCard = ({
         )}
         {!hideDefaultAction &&
           wallet.connected &&
-          auctionView.auction.info.ended() && (
+          isAuctionEnded(auctionView.auction.info) && (
             <Button
               type="primary"
               size="large"
@@ -345,7 +351,7 @@ export const AuctionCard = ({
 
         {!hideDefaultAction &&
           wallet.connected &&
-          !auctionView.auction.info.ended() &&
+          !isAuctionEnded(auctionView.auction.info) &&
           (isAuctionNotStarted && !isAuctionManagerAuthorityNotWalletOwner ? (
             <Button
               type="primary"
