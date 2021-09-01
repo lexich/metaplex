@@ -1,7 +1,7 @@
 import { ApolloServer } from 'apollo-server';
 import { ExpressContext } from 'apollo-server-express';
 import { makeSchema } from 'nexus';
-import { MetaplexApi } from './api';
+import { MetaplexApiDataSource } from './api';
 import * as types from './schema';
 import path from 'path';
 
@@ -36,8 +36,9 @@ async function startApolloServer() {
     },
   });
 
+  const api = new MetaplexApiDataSource();
   const dataSources = () => ({
-    api: new MetaplexApi(),
+    api,
   });
 
   const context = ({ req }: ExpressContext) => {
@@ -49,8 +50,8 @@ async function startApolloServer() {
   const { url } = await server.listen();
   console.log(`🚀 Server ready at ${url}`);
 
-  console.log('🌋 Warm up data');
-  MetaplexApi.load();
+  console.log('🌋 Start warm up data');
+  api.preload().then(() => console.log('🌋 Finish warm up data'));
 }
 
-void startApolloServer();
+startApolloServer();
