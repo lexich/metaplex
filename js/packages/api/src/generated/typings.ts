@@ -264,6 +264,7 @@ export interface NexusGenObjects {
     tokenProgram?: NexusGenScalars['PublicKey'] | null; // PublicKey
     tokenVaultProgram?: NexusGenScalars['PublicKey'] | null; // PublicKey
   };
+  Subscription: {};
   Vault: {
     // root type
     allowFurtherShareCreation?: boolean | null; // Boolean
@@ -509,6 +510,10 @@ export interface NexusGenFieldTypes {
     tokenProgram: NexusGenScalars['PublicKey'] | null; // PublicKey
     tokenVaultProgram: NexusGenScalars['PublicKey'] | null; // PublicKey
   };
+  Subscription: {
+    // field return type
+    truths: boolean | null; // Boolean
+  };
   Vault: {
     // field return type
     allowFurtherShareCreation: boolean | null; // Boolean
@@ -736,6 +741,10 @@ export interface NexusGenFieldTypeNames {
     tokenMetadataProgram: 'PublicKey';
     tokenProgram: 'PublicKey';
     tokenVaultProgram: 'PublicKey';
+  };
+  Subscription: {
+    // field return type name
+    truths: 'Boolean';
   };
   Vault: {
     // field return type name
