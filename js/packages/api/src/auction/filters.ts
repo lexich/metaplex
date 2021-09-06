@@ -3,6 +3,7 @@ import {
   getAuctionState,
   AuctionViewState,
 } from '@oyster/common/dist/lib/models/auction';
+import { MetaplexApi } from '../api';
 import { NexusGenInputs } from '../generated/typings';
 import { Auction } from '../sourceTypes';
 import { wrapPubkey } from '../utils/mapInfo';
